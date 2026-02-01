@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CampusMart | Buy & Sell on Campus</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo">CampusMart</div>
+  <input type="text" id="search" placeholder="Search books, gadgets, cycles..." />
+  <div class="nav-links">
+    <button onclick="goToAddListings()">Add Listings</button>
+    <a href="login.html">Login</a>
+    <a href="signup.html" class="btn">Sign Up</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <h1>Your Campus Marketplace</h1>
+  <p>Buy • Sell • Exchange items with students near you</p>
+  <button class="hero-btn" onclick="goToListings()">Explore Listings</button>
+</section>
+
+<!-- Categories -->
+<section class="categories">
+  <h2>Popular Categories</h2>
+  <div class="cards">
+    <div class="card">📚 Books</div>
+    <div class="card">💻 Electronics</div>
+    <div class="card">🚲 Cycles</div>
+    <div class="card">🛏️ Hostel Items</div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>© 2026 CampusMart | Made for Students 🚀</p>
+</footer>
+
+<script src="assets/js/script.js"></script>
+
+<script>
+function goToListings() {
+  // window.location.href = "listings.html";
+  window.location.href = "http://localhost:8888/listings";
+}
+
+function goToAddListings() {
+  window.location.href = "http://localhost:8888/addListings";
+}
+</script>
+
+</body>
+</html>
