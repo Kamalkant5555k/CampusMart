@@ -1,4 +1,6 @@
 
+
+
 const express = require("express");// express import
 const cors = require("cors");// cors import
 const ejs = require("ejs");// ejs import
@@ -11,6 +13,19 @@ app.set("view engine", "ejs");// view engine set
 app.set("views", path.join(__dirname, "views"));// views folder path
 
 const Listing = require("./Models/listings");// listings model import
+
+// multer storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+// const upload = multer({ storage });
+
 
 
 // database connect
@@ -31,6 +46,8 @@ app.use(cors());// cors middleware
 app.use(express.json());// json body read
 app.use(express.urlencoded({ extended: true }));// form data read
 app.use(express.static("public"));// static files serve
+app.use(express.static(path.join(__dirname, "public")));
+
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -41,7 +58,29 @@ const upload = multer({
 });
 
 
-// POST: upload + save
+// // POST: upload + save
+// app.post("/addNewList", upload.single("listing[image]"), async (req, res) => {
+//   try {
+//     const newListing = new Listing({
+//       title: req.body.title,
+//       description: req.body.description,
+//       price: req.body.price,
+//       category: req.body.category,
+//       condition: req.body.condition,
+//       images: req.file ? ["/uploads/" + req.file.filename] : []
+//     });
+
+//     await newListing.save();
+//     res.send("Listing saved successfully 🚀");
+//     console.log("New listing saved:", newListing);
+//   } catch (err) {
+//     console.log(err);
+//     res.status(400).send("Error saving listing");
+//   }
+// });
+
+
+// POST: upload + save listing
 app.post("/addNewList", upload.single("listing[image]"), async (req, res) => {
   try {
     const newListing = new Listing({
@@ -50,12 +89,17 @@ app.post("/addNewList", upload.single("listing[image]"), async (req, res) => {
       price: req.body.price,
       category: req.body.category,
       condition: req.body.condition,
-      images: req.file ? ["/uploads/" + req.file.filename] : []
+      images: req.file
+        ? {
+            url: "/uploads/" + req.file.filename,
+            filename: req.file.filename,
+          }
+        : undefined,
     });
 
     await newListing.save();
-    res.send("Listing saved successfully 🚀");
     console.log("New listing saved:", newListing);
+    res.redirect("/listings");
   } catch (err) {
     console.log(err);
     res.status(400).send("Error saving listing");
@@ -64,15 +108,15 @@ app.post("/addNewList", upload.single("listing[image]"), async (req, res) => {
 
 
 
-
-
-
-
-
 // listings route
-app.get("/listings", (req, res) => {
-  res.render("expListings"); // ejs render
-  console.log("Listings page rendered"); // log
+app.get("/listings", async (req, res) => {
+  try {
+    const listings = await Listing.find({});
+    res.render("expListings", { listings }); // ejs render with listings data
+    console.log("Listings page rendered"); // log
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 //add new listing route

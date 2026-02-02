@@ -1,11 +1,59 @@
+
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Listings</title>
+     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h2>Welcome to Explore Listings</h2>
+
+<div class="div1">
+    <h2 class="h22">Welcome to Explore Listings</h2>
+</div>
+
+<div class="listings-container">
+
+    <% if (listings.length === 0) { %>
+        <p class="no-listings">No listings available right now.</p>
+    <% } %>
+
+    <% listings.forEach(listing => { %>
+        <div class="listing-card">
+            <h3><%= listing.title %></h3>
+
+            <p class="desc"><%= listing.description %></p>
+
+            <p class="price">₹ <%= listing.price %></p>
+
+            <p class="category">
+                Category: <%= listing.category %>
+            </p>
+
+            <p class="condition">
+                Condition: <%= listing.condition %>
+            </p>
+
+            <div>
+
+            <% if (listing.images && listing.images.url) { %>
+  <img 
+    src="<%= listing.images.url %>" 
+    alt="<%= listing.title %>" 
+    width="300"
+  >
+<% } else { %>
+  <p style="color:red;">Image not available</p>
+<% } %>
+
+            </div>
+
+          
+        </div>
+    <% }) %>
+
+</div>
+
 </body>
 </html>

@@ -24,9 +24,10 @@ const listingSchema = new mongoose.Schema({
         enum: ['New', 'Like New', 'Used'],
         default: 'Used'
     },
-    images: {
-        type: [String]
-    },
+     images: {
+    filename: String,
+    url: String,
+  },
     // sellerName: {
     //     type: String,
     //     required: true
