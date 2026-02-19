@@ -1,11 +1,14 @@
 
 
+const methodOverride = require("method-override");
 
+require("dotenv").config();
 const express = require("express");// express import
 const cors = require("cors");// cors import
 const ejs = require("ejs");// ejs import
 const mongoose = require("mongoose");// mongoose import
-const multer = require("multer");// multer import
+const multer = require("multer");// multer 
+
 const path = require("path");// path import
 const app = express();// app create
 const PORT = 8888;
@@ -15,14 +18,17 @@ app.set("views", path.join(__dirname, "views"));// views folder path
 const Listing = require("./Models/listings");// listings model import
 
 // multer storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "public/uploads");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, Date.now() + "-" + file.originalname);
+//   },
+// });
+const { storage } = require("./cloudConfig");
+
+const upload = multer({ storage });
 
 // const upload = multer({ storage });
 
@@ -44,67 +50,55 @@ await mongoose.connect('mongodb://127.0.0.1:27017/CAMPUSMART-db');
 // middlewares
 app.use(cors());// cors middleware
 app.use(express.json());// json body read
+app.use(methodOverride("_method"));
+
 app.use(express.urlencoded({ extended: true }));// form data read
 app.use(express.static("public"));// static files serve
 app.use(express.static(path.join(__dirname, "public")));
 
 
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: "public/uploads",
-    filename: (req, file, cb) =>
-      cb(null, Date.now() + path.extname(file.originalname))
-  })
-});
-
-
-// // POST: upload + save
-// app.post("/addNewList", upload.single("listing[image]"), async (req, res) => {
-//   try {
-//     const newListing = new Listing({
-//       title: req.body.title,
-//       description: req.body.description,
-//       price: req.body.price,
-//       category: req.body.category,
-//       condition: req.body.condition,
-//       images: req.file ? ["/uploads/" + req.file.filename] : []
-//     });
-
-//     await newListing.save();
-//     res.send("Listing saved successfully 🚀");
-//     console.log("New listing saved:", newListing);
-//   } catch (err) {
-//     console.log(err);
-//     res.status(400).send("Error saving listing");
-//   }
+// const upload = multer({
+//   storage: multer.diskStorage({
+//     destination: "public/uploads",
+//     filename: (req, file, cb) =>
+//       cb(null, Date.now() + path.extname(file.originalname))
+//   })
 // });
+
 
 
 // POST: upload + save listing
 app.post("/addNewList", upload.single("listing[image]"), async (req, res) => {
   try {
+
+  console.log(JSON.stringify(req.body, null, 2));
+console.log(JSON.stringify(req.file, null, 2));
+ 
+
+    if (!req.file) {
+      return res.status(400).send("Image is required");
+    }
+
     const newListing = new Listing({
       title: req.body.title,
       description: req.body.description,
       price: req.body.price,
       category: req.body.category,
       condition: req.body.condition,
-      images: req.file
-        ? {
-            url: "/uploads/" + req.file.filename,
-            filename: req.file.filename,
-          }
-        : undefined,
+      img: req.file.path
     });
 
     await newListing.save();
-    console.log("New listing saved:", newListing);
+
+    console.log("Saved Successfully ✅");
     res.redirect("/listings");
+
   } catch (err) {
-    console.log(err);
-    res.status(400).send("Error saving listing");
+    console.log("ERROR:", err);
+    res.status(500).send("Error saving listing to database");
   }
 });
+
 
 
 
@@ -119,12 +113,73 @@ app.get("/listings", async (req, res) => {
   }
 });
 
-//add new listing route
-app.post("/addNewList", (req, res) => {
-  console.log("New listing added:", req.body);
-//   res.redirect("/listings");
-
+// listing details route
+app.get("/listings/:id", async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) {
+      return res.status(404).send("Listing not found");
+    }
+    res.render("listingDetails", { listing }); // ejs render with listing data
+  } catch (err) {
+    console.log(err);
+  }
 });
+
+//listing delete route
+app.delete("/listings/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Listing.findByIdAndDelete(id);
+    console.log("Listing deleted successfully ✅");
+    res.redirect("/listings");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error deleting listing");
+  }
+});
+
+//listing edit route
+app.get("/listings/:id/edit", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const listing = await Listing.findById(id);
+    if (!listing) {
+      return res.status(404).send("Listing not found");
+    } 
+    res.render("editListing", { listing }); // ejs render with listing data
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error fetching listing for edit");
+  }
+});
+
+app.put("/listings/:id", upload.single("listing[image]"), async (req, res) => { 
+  try {
+    const { id } = req.params;
+    const listing = await Listing.findById(id);
+    if (!listing) {
+      return res.status(404).send("Listing not found");
+    } 
+    listing.title = req.body.title;
+    listing.description = req.body.description;
+    listing.price = req.body.price;
+    listing.category = req.body.category;
+    listing.condition = req.body.condition;
+    if (req.file) {
+      listing.img = req.file.path;
+    }
+    await listing.save();
+    console.log("Listing updated successfully ✅");
+    res.redirect("/listings");
+  }
+    catch (err) { 
+      console.log(err);
+      res.status(500).send("Error updating listing");
+    }
+});
+
+
 
 // add listings route
 app.get("/addListings", (req, res) => {

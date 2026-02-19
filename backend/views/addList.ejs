@@ -27,7 +27,9 @@
   <h2>Add New Listing</h2>
 
   <!-- Listing Form -->
-  <form action="/addNewList" method="POST">
+<form action="/addNewList" method="POST" enctype="multipart/form-data">
+
+
 
     <!-- Title -->
     <input 
@@ -67,14 +69,12 @@
     </select>
 
     <!-- Images (comma separated URLs) -->
-     <div class="mb-3">
-             <!-- Image URL input -->
-             <label for="image" class="form-label">Upload Image</label>
-             <input name="listing[image]" placeholder="Enter image URL/Link" type="file" 
-              
-                class="form-control">
-                
-            </div>
+    <div mb-3>
+  <label>Upload Image</label>
+ <input type="file" name="listing[image]" required>
+
+</div>
+
 
     <!-- Submit -->
     <button type="submit">Add Listing</button>

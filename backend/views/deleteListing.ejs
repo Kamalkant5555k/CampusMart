@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Listing</title>
+</head>
+<body>
+    <div>
+        <h2>Delete Listing</h2>
+        <form action="/deleteListing" method="POST">
+            <input type="hidden" name="id" value="<%= listing._id %>">
+            <p>Are you sure you want to delete the listing: "<%= listing.title %>"?</p>
+            <button type="submit">Yes, Delete</button>
+            <a href="/listings">No, Go Back</a>
+        </form>
+    </div>
+    
+</body>
+</html>

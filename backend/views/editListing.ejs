@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Listing</title>
+</head>
+<body>
+    <h2>
+        Edit Listing: <%= listing.title %>
+    </h2>
+    <form action="/listings/<%= listing._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+        <input type="text" name="title" value="<%= listing.title %>" required>
+        <textarea name="description" rows="4" required><%= listing.description %></textarea>
+        <input type="number" name="price" value="<%= listing.price %>" required>
+        <select name="category" required>
+            <option value="">Select Category</option>
+            <option value="Books" <%= listing.category === 'Books' ? 'selected' : '' %>>Books</option>
+            <option value="Electronics" <%= listing.category === 'Electronics' ? 'selected' : '' %>>Electronics</option>
+            <option value="Hostel Items" <%= listing.category === 'Hostel Items' ? 'selected' : '' %>>Hostel Items</option>
+            <!-- Add more categories as needed -->
+        </select>
+        <select name="condition" required>
+            <option value="">Select Condition</option>
+            <option value="New" <%= listing.condition === 'New' ? 'selected' : '' %>>New</option>
+            <option value="Used - Like New" <%= listing.condition === 'Used - Like New' ? 'selected' : '' %>>Used - Like New</option>
+            <option value="Used - Good" <%= listing.condition === 'Used - Good' ? 'selected' : '' %>>Used - Good</option>
+            <!-- Add more conditions as needed -->
+        </select>
+        <input type="file" name="img">
+        <button type="submit">Update Listing</button>
+</form> 
+</body>
+</html>

@@ -9,10 +9,6 @@
 </head>
 <body>
 
-<div class="div1">
-    <h2 class="h22">Welcome to Explore Listings</h2>
-</div>
-
 <div class="listings-container">
 
     <% if (listings.length === 0) { %>
@@ -21,39 +17,54 @@
 
     <% listings.forEach(listing => { %>
         <div class="listing-card">
-            <h3><%= listing.title %></h3>
 
-            <p class="desc"><%= listing.description %></p>
+            <!-- Image -->
+            <% if (listing.img) { %>
+                <div class="image-wrapper">
+                    <img src="<%= listing.img %>" alt="<%= listing.title %>">
 
-            <p class="price">₹ <%= listing.price %></p>
+                    <!-- Like Button -->
+                    <div class="like-btn" onclick="toggleLike(this)">
+                        ❤️
+                    </div>
+                </div>
+            <% } %>
 
-            <p class="category">
-                Category: <%= listing.category %>
-            </p>
+            <!-- Content -->
+            <div class="card-content">
 
-            <p class="condition">
-                Condition: <%= listing.condition %>
-            </p>
+                <h4 class="card-title"><i>Title:</i> <%= listing.title %></h4>
 
-            <div>
+                <p class="card-desc">
+                    Description:
+                    <%= listing.description %>
+                </p>
 
-            <% if (listing.images && listing.images.url) { %>
-  <img 
-    src="<%= listing.images.url %>" 
-    alt="<%= listing.title %>" 
-    width="300"
-  >
-<% } else { %>
-  <p style="color:red;">Image not available</p>
-<% } %>
+                <p class="card-price">
+                    ₹ <%= listing.price %>
+                </p>
+                <div>
+                    <span class="card-category"><%= listing.category %></span>
+                    <span class="card-condition"><%= listing.condition %></span>
+                </div>
+
+                <!-- Buttons -->
+                <div class="card-actions">
+                    <a href="/listings/<%= listing._id %>" class="view-btn">View Details</a>
+                </div>
 
             </div>
-
-          
         </div>
     <% }) %>
 
 </div>
+
+<script>
+function toggleLike(btn){
+    btn.classList.toggle("liked");
+}
+</script>
+
 
 </body>
 </html>
